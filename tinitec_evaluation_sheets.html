@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TiniTec — Interview Evaluation Sheets</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d0f; --surface: #141417; --border: #222228; --border-bright: #38383f;
+    --text: #e8e8ec; --muted: #6b6b7a;
+    --ceo: #c8a96e; --ceo-dim: rgba(200,169,110,0.08);
+    --cto: #6e9fc8; --cto-dim: rgba(110,159,200,0.08);
+    --dev: #7ec8a0; --dev-dim: rgba(126,200,160,0.08);
+    --danger: #c86e6e; --radius: 4px;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+  .app { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+  .header { margin-bottom: 40px; }
+  .brand { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: 34px; line-height: 1.1; color: var(--text); margin-top: 6px; }
+  h1 em { font-style: italic; color: var(--muted); }
+  .subtitle { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.6; font-weight: 400; }
+  .tabs { display: flex; gap: 2px; margin-bottom: 32px; border-bottom: 1px solid var(--border); }
+  .tab { padding: 10px 20px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border: none; background: none; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: var(--text); }
+  .tab.active-ceo { color: var(--ceo); border-bottom-color: var(--ceo); }
+  .tab.active-cto { color: var(--cto); border-bottom-color: var(--cto); }
+  .tab.active-dev { color: var(--dev); border-bottom-color: var(--dev); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .role-badge { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: var(--radius); font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid; }
+  .role-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-top: 6px; }
+  .panel-mandate { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; max-width: 500px; }
+  .score-total { text-align: right; font-family: 'DM Mono', monospace; }
+  .score-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .score-number { font-size: 36px; font-weight: 500; line-height: 1; margin-top: 2px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .criterion { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .criterion:last-child { border-bottom: none; }
+  .criterion-label { font-size: 13px; font-weight: 600; }
+  .criterion-desc { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .criterion-weight { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+  .rating-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .stars { display: flex; gap: 4px; }
+  .star { width: 28px; height: 28px; border-radius: var(--radius); border: 1px solid var(--border-bright); background: var(--surface); cursor: pointer; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: all 0.1s; font-weight: 500; }
+  .star:hover { border-color: var(--border-bright); color: var(--text); }
+  .ceo-panel .star.lit { background: var(--ceo-dim); border-color: var(--ceo); color: var(--ceo); }
+  .cto-panel .star.lit { background: var(--cto-dim); border-color: var(--cto); color: var(--cto); }
+  .dev-panel .star.lit { background: var(--dev-dim); border-color: var(--dev); color: var(--dev); }
+  .criterion-score { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .notes-field { width: 100%; margin-top: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'Syne', sans-serif; font-size: 12px; padding: 10px 12px; resize: vertical; min-height: 60px; outline: none; transition: border-color 0.15s; }
+  .notes-field:focus { border-color: var(--border-bright); }
+  .notes-field::placeholder { color: var(--muted); }
+  .candidate-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+  .field-input { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'Syne', sans-serif; font-size: 13px; padding: 8px 12px; outline: none; transition: border-color 0.15s; }
+  .field-input:focus { border-color: var(--border-bright); }
+  .field-input::placeholder { color: var(--muted); }
+  .verdict-section { margin-top: 28px; }
+  .verdict-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .verdict-btn { padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border-bright); background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .verdict-btn:hover { color: var(--text); border-color: var(--text); }
+  .verdict-btn.selected-hire { background: rgba(126,200,160,0.12); border-color: var(--dev); color: var(--dev); }
+  .verdict-btn.selected-maybe { background: rgba(200,169,110,0.12); border-color: var(--ceo); color: var(--ceo); }
+  .verdict-btn.selected-no { background: rgba(200,110,110,0.12); border-color: var(--danger); color: var(--danger); }
+  .score-bar-wrap { margin-top: 24px; }
+  .score-bar-label { display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  .score-bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease; }
+  .ceo-panel .score-bar-fill { background: var(--ceo); }
+  .cto-panel .score-bar-fill { background: var(--cto); }
+  .dev-panel .score-bar-fill { background: var(--dev); }
+  .export-row { display: flex; justify-content: flex-end; margin-top: 36px; }
+  .export-btn { padding: 9px 20px; border-radius: var(--radius); border: 1px solid var(--border-bright); background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .export-btn:hover { color: var(--text); border-color: var(--text); }
+  @media (max-width: 600px) { .candidate-bar { grid-template-columns: 1fr 1fr; } .panel-header { flex-direction: column; } .score-total { text-align: left; } }
+  @media print { body { background: white; color: black; } .tabs { display: none; } .panel { display: block !important; page-break-after: always; } .export-btn { display: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <span class="brand">TiniTec · Interview System</span>
+    <h1>Candidate Evaluation <em>Sheets</em></h1>
+    <p class="subtitle">Three-panel scoring — CEO · CTO · Lead Dev &nbsp;|&nbsp; Each criterion rated 1–5 &nbsp;|&nbsp; Weighted final score out of 100</p>
+  </div>
+
+  <div class="candidate-bar">
+    <div class="field-group">
+      <span class="field-label">Candidate Name</span>
+      <input class="field-input" type="text" placeholder="Full name" id="cand-name">
+    </div>
+    <div class="field-group">
+      <span class="field-label">Role Applied</span>
+      <input class="field-input" type="text" placeholder="e.g. Flutter Dev" id="cand-role">
+    </div>
+    <div class="field-group">
+      <span class="field-label">Interview Date</span>
+      <input class="field-input" type="date" id="cand-date">
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active-ceo" onclick="switchTab('ceo')">CEO Panel</button>
+    <button class="tab" onclick="switchTab('cto')">CTO Panel</button>
+    <button class="tab" onclick="switchTab('dev')">Dev Panel</button>
+  </div>
+
+  <!-- ═══ CEO PANEL ═══ -->
+  <div class="panel active ceo-panel" id="panel-ceo">
+    <div class="panel-header">
+      <div>
+        <div class="role-badge" style="border-color:var(--ceo);color:var(--ceo);background:var(--ceo-dim)">
+          <span class="role-dot" style="background:var(--ceo)"></span>Chief Executive Officer
+        </div>
+        <div class="panel-title">Culture, Vision & Drive</div>
+        <div class="panel-mandate">Assesses long-term fit, founder alignment, communication clarity, and whether this person raises the bar.</div>
+      </div>
+      <div class="score-total">
+        <div class="score-label">Weighted Score</div>
+        <div class="score-number" id="ceo-total" style="color:var(--ceo)">—</div>
+      </div>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-label"><span>0</span><span>100</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill" id="ceo-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="section" style="margin-top:28px">
+      <div class="section-title">Alignment &amp; Ambition</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Mission Resonance</div>
+          <div class="criterion-desc">Do they understand what TiniTec is building? Can they articulate why they want to be here specifically — not just "great opportunity"?</div>
+          <div class="rating-row"><div class="stars" id="ceo-0"></div><span class="criterion-score" id="ceo-0-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-0-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Ambition &amp; Growth Trajectory</div>
+          <div class="criterion-desc">Are they building toward something? Evidence of self-initiated growth — side projects, skills they pursued proactively, roles they grew into.</div>
+          <div class="rating-row"><div class="stars" id="ceo-1"></div><span class="criterion-score" id="ceo-1-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-1-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Communication &amp; Ownership</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Communication Clarity</div>
+          <div class="criterion-desc">Can they explain complex things simply? Do they get to the point? Watch for over-hedging, circular answers, or inability to land a clear position.</div>
+          <div class="rating-row"><div class="stars" id="ceo-2"></div><span class="criterion-score" id="ceo-2-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-2-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Ownership Mindset</div>
+          <div class="criterion-desc">Do they describe their work as "we did X" or "I drove X"? Signs of real accountability vs. blame-shifting when things went wrong.</div>
+          <div class="rating-row"><div class="stars" id="ceo-3"></div><span class="criterion-score" id="ceo-3-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-3-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Culture &amp; Character</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Coachability &amp; Intellectual Humility</div>
+          <div class="criterion-desc">Push back on something mid-interview. Do they defend poorly or update gracefully? The best signal is how they handle being wrong in real time.</div>
+          <div class="rating-row"><div class="stars" id="ceo-4"></div><span class="criterion-score" id="ceo-4-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-4-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Bar-Raiser Test</div>
+          <div class="criterion-desc">In 6 months, will the team be measurably better because of this hire? Gut-check: would you be proud to have this person represent TiniTec externally?</div>
+          <div class="rating-row"><div class="stars" id="ceo-5"></div><span class="criterion-score" id="ceo-5-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="ceo-5-note"></textarea>
+        </div>
+        <div class="criterion-weight">×10%</div>
+      </div>
+    </div>
+
+    <div class="verdict-section">
+      <div class="section-title">CEO Verdict</div>
+      <div class="verdict-options">
+        <button class="verdict-btn" onclick="setVerdict('ceo','hire',this)">✓ Hire</button>
+        <button class="verdict-btn" onclick="setVerdict('ceo','maybe',this)">~ Strong Maybe</button>
+        <button class="verdict-btn" onclick="setVerdict('ceo','no',this)">✕ No</button>
+      </div>
+      <textarea class="notes-field" placeholder="CEO overall remarks…" id="ceo-final-note" style="margin-top:12px;min-height:80px"></textarea>
+    </div>
+    <div class="export-row"><button class="export-btn" onclick="window.print()">⊞ Print / Export All</button></div>
+  </div>
+
+  <!-- ═══ CTO PANEL ═══ -->
+  <div class="panel cto-panel" id="panel-cto">
+    <div class="panel-header">
+      <div>
+        <div class="role-badge" style="border-color:var(--cto);color:var(--cto);background:var(--cto-dim)">
+          <span class="role-dot" style="background:var(--cto)"></span>Chief Technology Officer
+        </div>
+        <div class="panel-title">Architecture, Thinking &amp; Technical Depth</div>
+        <div class="panel-mandate">Evaluates how the candidate thinks about systems, trade-offs, scalability, and technical judgment under real constraints.</div>
+      </div>
+      <div class="score-total">
+        <div class="score-label">Weighted Score</div>
+        <div class="score-number" id="cto-total" style="color:var(--cto)">—</div>
+      </div>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-label"><span>0</span><span>100</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill" id="cto-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="section" style="margin-top:28px">
+      <div class="section-title">Systems Thinking</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Architecture &amp; Design Judgment</div>
+          <div class="criterion-desc">Give a system prompt (e.g. "design a notifications service for 100K users"). Do they ask clarifying questions before proposing a solution, or jump straight in?</div>
+          <div class="rating-row"><div class="stars" id="cto-0"></div><span class="criterion-score" id="cto-0-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-0-note"></textarea>
+        </div>
+        <div class="criterion-weight">×25%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Trade-off Reasoning</div>
+          <div class="criterion-desc">Can they articulate the cost of their decisions? SQL vs NoSQL, monolith vs microservices — do they default or think through context each time?</div>
+          <div class="rating-row"><div class="stars" id="cto-1"></div><span class="criterion-score" id="cto-1-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-1-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Technical Depth</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Depth in Core Domain</div>
+          <div class="criterion-desc">Do they know the "why" behind their tools, not just the "how"? Ask them to explain one technology they use as if to a junior dev — clarity reveals mastery.</div>
+          <div class="rating-row"><div class="stars" id="cto-2"></div><span class="criterion-score" id="cto-2-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-2-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Debugging &amp; Problem Decomposition</div>
+          <div class="criterion-desc">Present a vague bug ("app is slow in production"). Watch how they decompose. Do they isolate variables systematically, or guess randomly and hope?</div>
+          <div class="rating-row"><div class="stars" id="cto-3"></div><span class="criterion-score" id="cto-3-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-3-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Standards &amp; Velocity</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Code Quality Philosophy</div>
+          <div class="criterion-desc">What does "good code" mean to them? Do they mention maintainability, testing, readability — or just "it works and it ships"?</div>
+          <div class="rating-row"><div class="stars" id="cto-4"></div><span class="criterion-score" id="cto-4-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-4-note"></textarea>
+        </div>
+        <div class="criterion-weight">×10%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Velocity vs. Quality Balance</div>
+          <div class="criterion-desc">Can they ship fast without crippling debt? Have they navigated a real "cut corners now, pay later" decision? What did they choose, and what happened?</div>
+          <div class="rating-row"><div class="stars" id="cto-5"></div><span class="criterion-score" id="cto-5-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="cto-5-note"></textarea>
+        </div>
+        <div class="criterion-weight">×10%</div>
+      </div>
+    </div>
+
+    <div class="verdict-section">
+      <div class="section-title">CTO Verdict</div>
+      <div class="verdict-options">
+        <button class="verdict-btn" onclick="setVerdict('cto','hire',this)">✓ Hire</button>
+        <button class="verdict-btn" onclick="setVerdict('cto','maybe',this)">~ Strong Maybe</button>
+        <button class="verdict-btn" onclick="setVerdict('cto','no',this)">✕ No</button>
+      </div>
+      <textarea class="notes-field" placeholder="CTO overall remarks…" id="cto-final-note" style="margin-top:12px;min-height:80px"></textarea>
+    </div>
+    <div class="export-row"><button class="export-btn" onclick="window.print()">⊞ Print / Export All</button></div>
+  </div>
+
+  <!-- ═══ DEV PANEL ═══ -->
+  <div class="panel dev-panel" id="panel-dev">
+    <div class="panel-header">
+      <div>
+        <div class="role-badge" style="border-color:var(--dev);color:var(--dev);background:var(--dev-dim)">
+          <span class="role-dot" style="background:var(--dev)"></span>Full Stack / Flutter Dev
+        </div>
+        <div class="panel-title">Hands-on Skills &amp; Team Fit</div>
+        <div class="panel-mandate">Peer-level technical validation — code quality, real-world patterns, collaboration style, and net impact on the team day-to-day.</div>
+      </div>
+      <div class="score-total">
+        <div class="score-label">Weighted Score</div>
+        <div class="score-number" id="dev-total" style="color:var(--dev)">—</div>
+      </div>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-label"><span>0</span><span>100</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill" id="dev-bar" style="width:0%"></div></div>
+    </div>
+
+    <div class="section" style="margin-top:28px">
+      <div class="section-title">Practical Technical Skills</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Live Coding / Task Execution</div>
+          <div class="criterion-desc">Give a real task (paginated list + loading states in Flutter, or a REST endpoint with validation). Watch the process, not just the output — do they test as they go?</div>
+          <div class="rating-row"><div class="stars" id="dev-0"></div><span class="criterion-score" id="dev-0-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-0-note"></textarea>
+        </div>
+        <div class="criterion-weight">×25%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">State Management &amp; Data Flow</div>
+          <div class="criterion-desc">Do they understand how data moves through the app? Can they explain their global state choice (BLoC, Riverpod, Redux, Zustand…) and its trade-offs?</div>
+          <div class="rating-row"><div class="stars" id="dev-1"></div><span class="criterion-score" id="dev-1-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-1-note"></textarea>
+        </div>
+        <div class="criterion-weight">×20%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Error Handling &amp; Edge Cases</div>
+          <div class="criterion-desc">In their code or explanation, do they naturally consider failure paths? Or does everything assume the happy path and silently break at the edges?</div>
+          <div class="rating-row"><div class="stars" id="dev-2"></div><span class="criterion-score" id="dev-2-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-2-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Collaboration &amp; Process</div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Code Review Behavior</div>
+          <div class="criterion-desc">Ask: "Walk me through how you'd review this PR." Do they check correctness only, or also readability, test coverage, naming, and downstream side effects?</div>
+          <div class="rating-row"><div class="stars" id="dev-3"></div><span class="criterion-score" id="dev-3-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-3-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Estimation &amp; Scoping</div>
+          <div class="criterion-desc">Give them a vague feature request. Do they break it down before estimating, or throw a number out? Are their estimates defensible when challenged?</div>
+          <div class="rating-row"><div class="stars" id="dev-4"></div><span class="criterion-score" id="dev-4-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-4-note"></textarea>
+        </div>
+        <div class="criterion-weight">×15%</div>
+      </div>
+      <div class="criterion">
+        <div>
+          <div class="criterion-label">Peer Compatibility</div>
+          <div class="criterion-desc">Would existing devs want to work with this person daily? Do they listen, ask questions, or dominate? This is a deliberate intuition score — own it.</div>
+          <div class="rating-row"><div class="stars" id="dev-5"></div><span class="criterion-score" id="dev-5-score"></span></div>
+          <textarea class="notes-field" placeholder="Notes…" id="dev-5-note"></textarea>
+        </div>
+        <div class="criterion-weight">×10%</div>
+      </div>
+    </div>
+
+    <div class="verdict-section">
+      <div class="section-title">Dev Verdict</div>
+      <div class="verdict-options">
+        <button class="verdict-btn" onclick="setVerdict('dev','hire',this)">✓ Hire</button>
+        <button class="verdict-btn" onclick="setVerdict('dev','maybe',this)">~ Strong Maybe</button>
+        <button class="verdict-btn" onclick="setVerdict('dev','no',this)">✕ No</button>
+      </div>
+      <textarea class="notes-field" placeholder="Dev overall remarks…" id="dev-final-note" style="margin-top:12px;min-height:80px"></textarea>
+    </div>
+    <div class="export-row"><button class="export-btn" onclick="window.print()">⊞ Print / Export All</button></div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  ceo: { weights: [0.20, 0.15, 0.20, 0.20, 0.15, 0.10], count: 6 },
+  cto: { weights: [0.25, 0.20, 0.20, 0.15, 0.10, 0.10], count: 6 },
+  dev: { weights: [0.25, 0.20, 0.15, 0.15, 0.15, 0.10], count: 6 }
+};
+const ratings = { ceo: {}, cto: {}, dev: {} };
+
+function buildStars(panel, idx) {
+  const container = document.getElementById(`${panel}-${idx}`);
+  if (!container) return;
+  container.innerHTML = '';
+  for (let v = 1; v <= 5; v++) {
+    const btn = document.createElement('button');
+    btn.className = 'star';
+    btn.textContent = v;
+    btn.onclick = () => rate(panel, idx, v);
+    container.appendChild(btn);
+  }
+}
+
+function rate(panel, idx, value) {
+  ratings[panel][idx] = value;
+  const container = document.getElementById(`${panel}-${idx}`);
+  container.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('lit', i < value));
+  const labels = ['', 'Poor', 'Below Avg', 'Average', 'Strong', 'Exceptional'];
+  const scoreEl = document.getElementById(`${panel}-${idx}-score`);
+  if (scoreEl) scoreEl.textContent = `${value}/5 — ${labels[value]}`;
+  calcTotal(panel);
+}
+
+function calcTotal(panel) {
+  const cfg = CONFIG[panel];
+  let score = 0, filled = 0;
+  for (let i = 0; i < cfg.count; i++) {
+    if (ratings[panel][i] !== undefined) { score += ratings[panel][i] * cfg.weights[i]; filled++; }
+  }
+  const totalEl = document.getElementById(`${panel}-total`);
+  const barEl = document.getElementById(`${panel}-bar`);
+  if (filled === 0) { totalEl.textContent = '—'; barEl.style.width = '0%'; return; }
+  const pct = (score / (5 * cfg.weights.reduce((a, b) => a + b, 0))) * 100;
+  totalEl.textContent = Math.round(pct);
+  barEl.style.width = pct + '%';
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
+  const idx = { ceo: 0, cto: 1, dev: 2 }[name];
+  document.querySelectorAll('.tab')[idx].classList.add(`active-${name}`);
+}
+
+function setVerdict(panel, verdict, el) {
+  el.closest('.verdict-options').querySelectorAll('.verdict-btn').forEach(b => b.className = 'verdict-btn');
+  el.classList.add(`selected-${verdict}`);
+}
+
+['ceo', 'cto', 'dev'].forEach(panel => {
+  for (let i = 0; i < CONFIG[panel].count; i++) buildStars(panel, i);
+});
+</script>
+</body>
+</html>
